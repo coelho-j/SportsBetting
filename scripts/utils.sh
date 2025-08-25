@@ -93,3 +93,9 @@ os_source() {
 
     print_success "System package installation complete."
 }
+
+check_command() {
+    local cmd="$1"
+    command -v "$cmd" &> /dev/null
+    return $?
+}

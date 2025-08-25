@@ -3,21 +3,17 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
-REQUIREMENTS_FILE="${1:-.linux_reqs.txt}"
-INSTALL_SCRIPT="scripts/install_reqs.sh"
+source scripts/utils.sh
 
-check_command() {
-    local cmd="$1"
-    command -v "$cmd" &> /dev/null
-    return $?
-}
+
+REQUIREMENTS_FILE=".linux_reqs.txt"
+INSTALL_SCRIPT="scripts/install_reqs.sh"
 
 while IFS= read -r cmd || [ -n "$cmd" ]; do
     # Skip empty lines or comments
     [[ -z "$cmd" || "$cmd" =~ ^# ]] && continue
     cmd=$(echo "$cmd" | xargs) # Trim whitespace
     if ! check_command "$cmd"; then
-        missing_commands+=("$cmd")
         echo "Running $INSTALL_SCRIPT to install missing commands..."
         if bash "$INSTALL_SCRIPT"; then
             echo "Installation script completed successfully."
@@ -29,15 +25,21 @@ while IFS= read -r cmd || [ -n "$cmd" ]; do
 done < "$REQUIREMENTS_FILE"
 
 
-if [ ! -f .python-version ]; then
-    pyenv install 3.13 -s
-    pyenv local 3.13
+PYTHON_VERSION_FILE=".python-version"
+PYTHON_VERSION=$(tr -d '[:space:]' < "$PYTHON_VERSION_FILE")
+
+# Check if the exact python version is installed via pyenv. If not, install it.
+if ! pyenv versions --bare | grep -i "${PYTHON_VERSION}" >> /dev/null; then
+    echo "Python ${PYTHON_VERSION} not found in pyenv, installing..."
+    pyenv install "${PYTHON_VERSION}" -s
 fi
+
+pyenv local "${PYTHON_VERSION}"
 
 if [ ! -d .venv ]; then
     uv venv
 fi
 
 source .venv/bin/activate
-
 uv sync
+uv run python main.py
