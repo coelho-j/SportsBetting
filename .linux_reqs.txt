@@ -1,0 +1,3 @@
+python
+pyenv
+uv
