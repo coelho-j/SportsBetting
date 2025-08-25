@@ -73,9 +73,9 @@ os_source() {
     case "${os}" in
         "arch")
             print_info "Updating package database and upgrading system (pacman)..."
-            pacman -Syu --noconfirm
+            # pacman -Syu --noconfirm
             print_info "Installing packages..."
-            pacman -S --noconfirm --needed "${packages[@]}"
+            # pacman -S --noconfirm --needed "${packages[@]}"
             ;;
         "ubuntu")
             print_info "Updating package database (apt)..."
