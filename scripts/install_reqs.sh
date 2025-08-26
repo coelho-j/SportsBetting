@@ -13,7 +13,7 @@ PROJECT_DIR="${SCRIPT_DIR}/../"
 source "${SCRIPT_DIR}/utils.sh"
 
 # Define the path to the system package requirements file.
-DEFAULT_FILE="${PROJECT_DIR}/linux_reqs.txt"
+DEFAULT_FILE="${PROJECT_DIR}/.linux_reqs.txt"
 REQUIREMENTS_FILE="${1:-${DEFAULT_FILE}}"
 
 # Execute the OS-aware installation function.
