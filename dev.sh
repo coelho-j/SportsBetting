@@ -5,10 +5,11 @@ set -e
 
 source scripts/utils.sh
 
-PROJECT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+export PROJECT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-
-sudo chown -R $USER:$USER $PROJECT_DIR
+if [ "$(stat -c %U "$PROJECT_DIR")" != "$USER" ]; then
+    sudo chown -R "$USER":"$USER" "$PROJECT_DIR"
+fi
 
 
 REQUIREMENTS_FILE=".linux_reqs.txt"
@@ -42,7 +43,8 @@ fi
 pyenv local "${PYTHON_VERSION}"
 
 if [ ! -d .venv ]; then
-    uv venv
+    print_info "Creating virtual environment with Python ${PYTHON_VERSION}..."
+    uv venv -p "$(pyenv which python)"
 fi
 
 source .venv/bin/activate

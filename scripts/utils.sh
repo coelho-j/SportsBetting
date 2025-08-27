@@ -121,3 +121,38 @@ check_command() {
     command -v "$cmd" &> /dev/null
     return $?
 }
+
+export_env() {
+    # If an argument is provided, treat it as a file to source.
+    if [[ -n "$1" ]]; then
+        local source_file="$1"
+        if [[ ! -f "$source_file" ]]; then
+            print_error "Source file not found: ${source_file}"
+            return 1
+        fi
+        print_info "Sourcing environment file: ${source_file}"
+        # shellcheck source=/dev/null
+        source "${source_file}"
+        print_success "Sourced ${source_file}."
+        return 0
+    fi
+
+    # If no argument, default to processing .env in PROJECT_DIR.
+    if [[ -z "$PROJECT_DIR" ]]; then
+        print_error "PROJECT_DIR is not set. Cannot find default .env file."
+        return 1
+    fi
+    local env_file="${PROJECT_DIR}/.env"
+
+    if [[ ! -f "$env_file" ]]; then
+        print_info "Default environment file .env not found in ${PROJECT_DIR}. Skipping."
+        return 0
+    fi
+
+    print_info "Exporting environment variables from ${env_file}..."
+    set -a # Automatically export all variables from the sourced file.
+    # shellcheck source=/dev/null
+    source "${env_file}"
+    set +a # Disable auto-export.
+    print_success "Environment variables from ${env_file} exported."
+}

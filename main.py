@@ -1,5 +1,9 @@
+# main.py
+
+import pipeline.db
+
 def main():
-    print("Hello from sportsbetting!")
+    print("Running pipeline!")
 
 
 if __name__ == "__main__":
