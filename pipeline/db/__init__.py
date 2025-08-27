@@ -4,6 +4,7 @@ import duckdb
 import pandas as pd
 import pybaseball as pyb
 import os
+import sys
 from .sql.pybaseball.db import CREATE_SCHEMAS
 from .sql.pybaseball.raw import (
     CREATE_TEAM_BATTING, CREATE_TEAM_PITCHING, CREATE_GAME_LOGS,
@@ -237,7 +238,15 @@ def verify():
     if not os.path.exists(db_path):
         raise FileNotFoundError(f"Database file not found at {db_path}. Run setup() first.")
     
-    con = duckdb.connect(database=db_path, read_only=True)
+    try:
+        con = duckdb.connect(database=db_path, read_only=True)
+    except duckdb.IOException as e:
+        if 'lock on file' in str(e):
+            print("Close any services that may be using DuckDB")
+            sys.exit(1)
+        else:
+            print(f"Error connecting to database: {e}")
+            sys.exit(1)
     
     try:
         # Check schemas using information_schema (compatible with DuckDB)
@@ -308,9 +317,11 @@ def verify():
                 raise ValueError("Player data integrity check failed for Mike Trout (batting).")
         
         print("Database integrity verified successfully: schemas and tables are correct. Data population may be partial if fetches failed.")
-    
+        
     finally:
         con.close()
+    
+    print("ok")
 
 # Auto-run if module executed directly
 if __name__ == "__main__":

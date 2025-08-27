@@ -49,4 +49,12 @@ fi
 
 source .venv/bin/activate
 uv sync
-uv run python main.py
+
+uv run db-verify
+echo $?
+if [$? -eq 0] ; then
+    echo "db-verify failed"
+    uv run db-setup
+
+fi
+
