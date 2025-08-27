@@ -5,8 +5,14 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    # Data Management
     "pandas",
+
+    # Data Sources
     "pybaseball",
+
+    # DB
+    "duckdb",
 
     # Dev Deps
     "jedi==0.18.2",

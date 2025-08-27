@@ -29,11 +29,33 @@ print_error() {
 os_source() {
     local requirements_file="$1"
 
-    # 1. Check for root privileges
-    if [[ "${EUID}" -ne 0 ]]; then
-        print_error "This function must be run as root. Try running with 'sudo'."
-        exit 1
-    fi
+    # 1. Check for root privileges, and elevate if necessary.
+    # if [[ "${EUID}" -ne 0 ]]; then
+    #     if ! command -v sudo &> /dev/null; then
+    #         print_error "sudo is not installed. Please run this script as root."
+    #         exit 1
+    #     fi
+    #     print_info "This script requires superuser privileges to install system packages."
+
+    #     # Find the calling script. BASH_SOURCE[0] is this script (utils.sh),
+    #     # and BASH_SOURCE[1] is the script that sourced it.
+    #     local calling_script_path="${BASH_SOURCE[1]}"
+    #     if [[ -z "$calling_script_path" ]]; then
+    #         print_error "Cannot determine calling script. This script should be sourced."
+    #         exit 1
+    #     fi
+
+    #     # Resolve the path of the calling script to be absolute. This is crucial
+    #     # because `sudo` may not have the same working directory, and a relative
+    #     # path would fail. The `cd ... && pwd` trick is a portable way to do this.
+    #     local calling_script
+    #     calling_script="$(cd -- "$(dirname -- "$calling_script_path")" &>/dev/null && pwd)/$(basename -- "$calling_script_path")"
+
+    #     print_info "Attempting to re-run with sudo..."
+    #     # Re-execute the calling script with sudo, passing along the arguments.
+    #     # 'exec' replaces the current shell process with the new one.
+    #     exec sudo -- bash "$calling_script" "$@"
+    # fi
 
     # 2. Validate input
     if [[ -z "${requirements_file}" ]]; then
@@ -72,10 +94,10 @@ os_source() {
     # 5. Install packages based on the detected OS
     case "${os}" in
         "arch")
-            print_info "Updating package database and upgrading system (pacman)..."
+            print_info "Updating package database and upgrading system (yay)..."
             # pacman -Syu --noconfirm
             print_info "Installing packages..."
-            # pacman -S --noconfirm --needed "${packages[@]}"
+            yay -S --noconfirm --needed "${packages[@]}"
             ;;
         "ubuntu")
             print_info "Updating package database (apt)..."

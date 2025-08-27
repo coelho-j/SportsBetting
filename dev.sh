@@ -5,6 +5,11 @@ set -e
 
 source scripts/utils.sh
 
+PROJECT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+
+sudo chown -R $USER:$USER $PROJECT_DIR
+
 
 REQUIREMENTS_FILE=".linux_reqs.txt"
 INSTALL_SCRIPT="scripts/install_reqs.sh"
