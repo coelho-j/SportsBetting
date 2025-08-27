@@ -51,10 +51,8 @@ source .venv/bin/activate
 uv sync
 
 uv run db-verify
-echo $?
-if [$? -eq 0] ; then
+if [ ! $? -eq 0 ]; then
     echo "db-verify failed"
     uv run db-setup
-
 fi
 
